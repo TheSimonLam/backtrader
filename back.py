@@ -11,7 +11,7 @@ import backtrader as bt
 # Create a Stratey
 class TestStrategy(bt.Strategy):
     params = (
-        ('maperiod', 15),
+        ('maperiod', 200),
     )
 
     def log(self, txt, dt=None):
@@ -30,7 +30,7 @@ class TestStrategy(bt.Strategy):
 
         # Add a MovingAverageSimple indicator
         self.sma = bt.indicators.SimpleMovingAverage(
-            self.datas[0], period=self.params.maperiod)
+            self.data1, period=self.params.maperiod)
 
     def notify_order(self, order):
         if order.status in [order.Submitted, order.Accepted]:
@@ -115,7 +115,6 @@ if __name__ == '__main__':
         fromdate=datetime.datetime(2007, 1, 1),
         todate=datetime.datetime(2022, 8, 29),
         reverse=False,
-        timeframe=bt.TimeFrame.Minutes,                            
         nullvalue=0.0,
         datetime=0,
         high=2,
@@ -126,6 +125,8 @@ if __name__ == '__main__':
         openinterest=-1,)
 
     cerebro.adddata(data)
+
+    cerebro.resampledata(data, timeframe = bt.TimeFrame.Days, compression = 24)
 
     # Set our desired cash start
     cerebro.broker.setcash(1000.0)
