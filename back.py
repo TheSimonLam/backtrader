@@ -109,14 +109,21 @@ if __name__ == '__main__':
     datapath = os.path.join(modpath, 'EURUSD_H1.csv')
 
     # Create a Data Feed
-    data = bt.feeds.YahooFinanceCSVData(
+    data = bt.feeds.GenericCSVData(
         dataname=datapath,
-        # Do not pass values before this date
+        dtformat=('%Y-%m-%d %H:%M'),
         fromdate=datetime.datetime(2007, 1, 1),
-        # Do not pass values before this date
         todate=datetime.datetime(2022, 8, 29),
-        # Do not pass values after this date
-        reverse=False)
+        reverse=False,
+        timeframe=bt.TimeFrame.Minutes,                            
+        nullvalue=0.0,
+        datetime=0,
+        high=2,
+        low=3,
+        open=1,
+        close=4,
+        volume=5,
+        openinterest=-1,)
 
     cerebro.adddata(data)
 
