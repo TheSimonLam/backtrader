@@ -92,13 +92,13 @@ class TestStrategy(bt.Strategy):
                 self.order = self.buy()
 
         else:
-
-            if self.dataclose[0] < self.sma[0]:
+            # Already in the market ... we might sell
+            if len(self) >= (self.bar_executed + 5000):
                 # SELL, SELL, SELL!!! (with all possible default parameters)
                 self.log('SELL CREATE, %.2f' % self.dataclose[0])
 
                 # Keep track of the created order to avoid a 2nd order
-                self.order = self.sell()
+                self.order = self.close()
 
 
 if __name__ == '__main__':
@@ -139,9 +139,6 @@ if __name__ == '__main__':
 
     # Add a FixedSize sizer according to the stake
     cerebro.addsizer(bt.sizers.FixedSize, stake=10)
-
-    # Set the commission
-    cerebro.broker.setcommission(commission=0.0)
 
     # Print out the starting conditions
     print('Starting Portfolio Value: %.2f' % cerebro.broker.getvalue())
