@@ -18,7 +18,7 @@ class TestStrategy(bt.Strategy):
     def log(self, txt, dt=None):
         ''' Logging function fot this strategy'''
         dt = dt or self.datas[0].datetime.date(0)
-        print('%s, %s' % (dt.isoformat(), txt))
+        # print('%s, %s' % (dt.isoformat(), txt))
 
     def __init__(self):
         # Keep a reference to the "close" line in the data[0] dataseries
@@ -29,7 +29,7 @@ class TestStrategy(bt.Strategy):
         self.buyprice = None
         self.buycomm = None
 
-        self.POINT_DISTANCE_TO_CLOSE_TRADE = 0.015
+        self.POINT_DISTANCE_TO_CLOSE_TRADE = 0.10
         self.BET_SIZE_MULTIPLIER = 24
 
         self.startingBetSize = 50
@@ -107,11 +107,13 @@ class TestStrategy(bt.Strategy):
 
             if not self.position:
                 if self.shouldLongAccordingTo200MA:
+                    print('entered trade long')
                     self.log('BUY CREATE, %.2f' % self.dataclose[0])
                     self.buyprice = self.dataclose[0]
                     self.order = self.buy(price=self.betSize)
                     self.isLong = True
                 else:
+                    print('entered trade short')
                     self.log('SELL CREATE, %.2f' % self.dataclose[0])
                     self.buyprice = self.dataclose[0]
                     self.order = self.sell(price=self.betSize)
@@ -163,8 +165,8 @@ if __name__ == '__main__':
         dataname=datapath,
         dtformat=('%Y-%m-%d %H:%M'),
         fromdate=datetime.datetime(2007, 1, 1),
-        todate=datetime.datetime(2007, 10, 20),
-        # todate=datetime.datetime(2022, 8, 29),
+        # todate=datetime.datetime(2007, 10, 20),
+        todate=datetime.datetime(2022, 8, 29),
         reverse=False,
         nullvalue=0.0,
         datetime=0,
