@@ -29,7 +29,7 @@ class TestStrategy(bt.Strategy):
         self.buyprice = None
         self.buycomm = None
 
-        self.POINT_DISTANCE_TO_CLOSE_TRADE = 0.10
+        self.POINT_DISTANCE_TO_CLOSE_TRADE = 0.01
         self.BET_SIZE_MULTIPLIER = 24
 
         self.startingBetSize = 50
@@ -107,16 +107,14 @@ class TestStrategy(bt.Strategy):
 
             if not self.position:
                 if self.shouldLongAccordingTo200MA:
-                    print('entered trade long')
                     self.log('BUY CREATE, %.2f' % self.dataclose[0])
                     self.buyprice = self.dataclose[0]
-                    self.order = self.buy(price=self.betSize)
+                    self.order = self.buy(size=self.betSize)
                     self.isLong = True
                 else:
-                    print('entered trade short')
                     self.log('SELL CREATE, %.2f' % self.dataclose[0])
                     self.buyprice = self.dataclose[0]
-                    self.order = self.sell(price=self.betSize)
+                    self.order = self.sell(size=self.betSize)
                     self.isLong = False
 
         else:
@@ -142,7 +140,8 @@ class TestStrategy(bt.Strategy):
                     self.order = self.close()
                     self.betSize = self.betSize * 2
                 
-            # if len(self) >= (self.bar_executed + 5000):
+            # if len(self) >= (self.bar_executed + 10000):
+            #     print('close: ', self.dataclose[0])
             #     self.log('SELL CREATE, %.2f' % self.dataclose[0])
 
             #     self.order = self.close()
