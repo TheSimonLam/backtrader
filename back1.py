@@ -28,12 +28,12 @@ class TestStrategy(bt.Strategy):
         self.buyprice = None
 
         self.POINT_DISTANCE_TO_CLOSE_TRADE = 0.01
-        self.BET_SIZE_MULTIPLIER = 0
+        self.BET_SIZE_MULTIPLIER = 100
         self.bankrupt = False
 
-        self.startingBetSize = 50
+        self.startingBetSize = 240
         self.betSize = self.startingBetSize
-        self.shouldLongAccordingTo200MA = False
+        self.shouldLongAccordingTo200MA = True
         self.isLong = False
 
         # Add a MovingAverageSimple indicator
@@ -96,15 +96,14 @@ class TestStrategy(bt.Strategy):
 
         # Check if we are in the market
         if not self.position:
-            if not self.position:
-                if self.shouldLongAccordingTo200MA:
-                    self.log('BUY CREATE, %.2f' % self.dataclose[0])
-                    self.order = self.buy(size=self.betSize)
-                    self.isLong = True
-                else:
-                    self.log('SELL CREATE, %.2f' % self.dataclose[0])
-                    self.order = self.sell(size=self.betSize)
-                    self.isLong = False
+            if self.shouldLongAccordingTo200MA:
+                self.log('BUY CREATE, %.2f' % self.dataclose[0])
+                self.order = self.buy(size=self.betSize)
+                self.isLong = True
+            else:
+                self.log('SELL CREATE, %.2f' % self.dataclose[0])
+                self.order = self.sell(size=self.betSize)
+                self.isLong = False
 
         else:
             if self.isLong:
@@ -146,9 +145,11 @@ if __name__ == '__main__':
         dataname=datapath,
         dtformat=('%Y-%m-%d %H:%M'),
         fromdate=datetime.datetime(2007, 1, 1),
-        # todate=datetime.datetime(2007, 10, 20),
+        # todate=datetime.datetime(2007, 8, 24),
         todate=datetime.datetime(2022, 8, 29),
         reverse=False,
+        timeframe = bt.TimeFrame.Minutes, 
+        compression = 60,
         nullvalue=0.0,
         datetime=0,
         high=2,
@@ -161,7 +162,7 @@ if __name__ == '__main__':
     # Add the Data Feed to Cerebro
     cerebro.adddata(data)
 
-    cerebro.resampledata(data, timeframe = bt.TimeFrame.Days, compression = 24)
+    cerebro.resampledata(data, timeframe = bt.TimeFrame.Days, compression = 1)
 
     # Set our desired cash start
     cerebro.broker.setcash(10000.0)
@@ -176,4 +177,4 @@ if __name__ == '__main__':
     print('Final Portfolio Value: %.2f' % cerebro.broker.getvalue())
 
     # Plot the result
-    cerebro.plot()
+    cerebro.plot(style='candle')
