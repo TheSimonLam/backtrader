@@ -12,10 +12,11 @@ import backtrader as bt
 # Create a Stratey
 class TestStrategy(bt.Strategy):
     params = (
-        ('maperiod', 200),
+        ('maperiod', 15),
     )
 
     def log(self, txt, dt=None):
+        ''' Logging function fot this strategy'''
         dt = dt or self.datas[0].datetime.date(0)
         print('%s, %s' % (dt.isoformat(), txt))
 
@@ -26,19 +27,11 @@ class TestStrategy(bt.Strategy):
         # To keep track of pending orders and buy price/commission
         self.order = None
         self.buyprice = None
-
-        self.POINT_DISTANCE_TO_CLOSE_TRADE = 0.01
-        self.BET_SIZE_MULTIPLIER = 0
-        self.bankrupt = False
-
-        self.startingBetSize = 50
-        self.betSize = self.startingBetSize
-        self.shouldLongAccordingTo200MA = False
-        self.isLong = False
+        self.buycomm = None
 
         # Add a MovingAverageSimple indicator
         self.sma = bt.indicators.SimpleMovingAverage(
-            self.data1, period=self.params.maperiod)
+            self.datas[0], period=self.params.maperiod)
 
     def notify_order(self, order):
         if order.status in [order.Submitted, order.Accepted]:
@@ -56,6 +49,7 @@ class TestStrategy(bt.Strategy):
                      order.executed.comm))
 
                 self.buyprice = order.executed.price
+                self.buycomm = order.executed.comm
             else:  # Sell
                 self.log('SELL EXECUTED, Price: %.2f, Cost: %.2f, Comm %.2f' %
                          (order.executed.price,
@@ -66,7 +60,6 @@ class TestStrategy(bt.Strategy):
 
         elif order.status in [order.Canceled, order.Margin, order.Rejected]:
             self.log('Order Canceled/Margin/Rejected')
-            self.bankrupt = True
 
         # Write down: no pending order
         self.order = None
@@ -80,15 +73,7 @@ class TestStrategy(bt.Strategy):
 
     def next(self):
         # Simply log the closing price of the series from the reference
-        # self.log('Close, %.2f' % self.dataclose[0])
-
-        if self.bankrupt is True:
-            cerebro.runstop()
-
-        if self.sma[0] > self.sma[-1]:
-            self.shouldLongAccordingTo200MA = True
-        elif self.sma[0] < self.sma[-1]:
-            self.shouldLongAccordingTo200MA = False
+        self.log('Close, %.2f' % self.dataclose[0])
 
         # Check if an order is pending ... if yes, we cannot send a 2nd one
         if self.order:
@@ -96,38 +81,25 @@ class TestStrategy(bt.Strategy):
 
         # Check if we are in the market
         if not self.position:
-            if not self.position:
-                if self.shouldLongAccordingTo200MA:
-                    self.log('BUY CREATE, %.2f' % self.dataclose[0])
-                    self.order = self.buy(size=self.betSize)
-                    self.isLong = True
-                else:
-                    self.log('SELL CREATE, %.2f' % self.dataclose[0])
-                    self.order = self.sell(size=self.betSize)
-                    self.isLong = False
+
+            # Not yet ... we MIGHT BUY if ...
+            if self.dataclose[0] > self.sma[0]:
+
+                # BUY, BUY, BUY!!! (with all possible default parameters)
+                self.log('BUY CREATE, %.2f' % self.dataclose[0])
+
+                # Keep track of the created order to avoid a 2nd order
+                self.order = self.buy()
 
         else:
-            if self.isLong:
-                if self.buyprice < self.dataclose[0] - self.POINT_DISTANCE_TO_CLOSE_TRADE:
-                    #Good outcome
-                    self.order = self.close()
-                    self.betSize = self.startingBetSize
-                    self.startingBetSize += self.BET_SIZE_MULTIPLIER
-                elif self.buyprice > self.dataclose[0] + self.POINT_DISTANCE_TO_CLOSE_TRADE:
-                    #Bad outcome
-                    self.order = self.close()
-                    self.betSize = self.betSize * 2
-      
-            else: 
-                if self.buyprice > self.dataclose[0] + self.POINT_DISTANCE_TO_CLOSE_TRADE:
-                    #Good outcome
-                    self.order = self.close()
-                    self.betSize = self.startingBetSize
-                    self.startingBetSize += self.BET_SIZE_MULTIPLIER
-                elif self.buyprice < self.dataclose[0] - self.POINT_DISTANCE_TO_CLOSE_TRADE:
-                    #Bad outcome
-                    self.order = self.close()
-                    self.betSize = self.betSize * 2
+
+            if self.dataclose[0] < self.sma[0]:
+                # SELL, SELL, SELL!!! (with all possible default parameters)
+                self.log('SELL CREATE, %.2f' % self.dataclose[0])
+
+                # Keep track of the created order to avoid a 2nd order
+                self.order = self.sell()
+
 
 if __name__ == '__main__':
     # Create a cerebro entity
@@ -139,32 +111,29 @@ if __name__ == '__main__':
     # Datas are in a subfolder of the samples. Need to find where the script is
     # because it could have been called from anywhere
     modpath = os.path.dirname(os.path.abspath(sys.argv[0]))
-    datapath = os.path.join(modpath, 'EURUSD_H1.csv')
+    datapath = os.path.join(modpath, 'orcl-1995-2014.txt')
 
     # Create a Data Feed
-    data = bt.feeds.GenericCSVData(
+    data = bt.feeds.YahooFinanceCSVData(
         dataname=datapath,
-        dtformat=('%Y-%m-%d %H:%M'),
-        fromdate=datetime.datetime(2007, 1, 1),
-        # todate=datetime.datetime(2007, 10, 20),
-        todate=datetime.datetime(2022, 8, 29),
-        reverse=False,
-        nullvalue=0.0,
-        datetime=0,
-        high=2,
-        low=3,
-        open=1,
-        close=4,
-        volume=-1,
-        openinterest=-1)
+        # Do not pass values before this date
+        fromdate=datetime.datetime(2000, 1, 1),
+        # Do not pass values before this date
+        todate=datetime.datetime(2000, 12, 31),
+        # Do not pass values after this date
+        reverse=False)
 
     # Add the Data Feed to Cerebro
     cerebro.adddata(data)
 
-    cerebro.resampledata(data, timeframe = bt.TimeFrame.Days, compression = 24)
-
     # Set our desired cash start
-    cerebro.broker.setcash(10000.0)
+    cerebro.broker.setcash(1000.0)
+
+    # Add a FixedSize sizer according to the stake
+    cerebro.addsizer(bt.sizers.FixedSize, stake=10)
+
+    # Set the commission
+    cerebro.broker.setcommission(commission=0.0)
 
     # Print out the starting conditions
     print('Starting Portfolio Value: %.2f' % cerebro.broker.getvalue())
@@ -176,4 +145,4 @@ if __name__ == '__main__':
     print('Final Portfolio Value: %.2f' % cerebro.broker.getvalue())
 
     # Plot the result
-    cerebro.plot()
+    cerebro.plot(style='candle')
