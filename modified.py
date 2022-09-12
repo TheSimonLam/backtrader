@@ -12,7 +12,7 @@ import backtrader as bt
 # Create a Stratey
 class TestStrategy(bt.Strategy):
     params = (
-        ('maperiod', 15),
+        ('maperiod', 200),
     )
 
     def log(self, txt, dt=None):
@@ -31,7 +31,7 @@ class TestStrategy(bt.Strategy):
 
         # Add a MovingAverageSimple indicator
         self.sma = bt.indicators.SimpleMovingAverage(
-            self.datas[0], period=self.params.maperiod)
+            self.data1, period=self.params.maperiod)
 
     def notify_order(self, order):
         if order.status in [order.Submitted, order.Accepted]:
@@ -111,20 +111,31 @@ if __name__ == '__main__':
     # Datas are in a subfolder of the samples. Need to find where the script is
     # because it could have been called from anywhere
     modpath = os.path.dirname(os.path.abspath(sys.argv[0]))
-    datapath = os.path.join(modpath, 'orcl-1995-2014.txt')
+    datapath = os.path.join(modpath, 'EURUSD_H1.csv')
 
     # Create a Data Feed
-    data = bt.feeds.YahooFinanceCSVData(
+    data = bt.feeds.GenericCSVData(
         dataname=datapath,
-        # Do not pass values before this date
-        fromdate=datetime.datetime(2000, 1, 1),
-        # Do not pass values before this date
-        todate=datetime.datetime(2000, 12, 31),
-        # Do not pass values after this date
-        reverse=False)
+        dtformat=('%Y-%m-%d %H:%M'),
+        fromdate=datetime.datetime(2007, 1, 1),
+        # todate=datetime.datetime(2007, 10, 20),
+        todate=datetime.datetime(2022, 8, 29),
+        reverse=False,
+        nullvalue=0.0,
+        timeframe = bt.TimeFrame.Days, 
+        compression = 1,
+        datetime=0,
+        high=2,
+        low=3,
+        open=1,
+        close=4,
+        volume=-1,
+        openinterest=-1)
 
     # Add the Data Feed to Cerebro
     cerebro.adddata(data)
+
+    cerebro.resampledata(data, timeframe = bt.TimeFrame.Days, compression = 1)
 
     # Set our desired cash start
     cerebro.broker.setcash(1000.0)
