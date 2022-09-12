@@ -182,7 +182,7 @@ if __name__ == '__main__':
     cerebro.resampledata(data, timeframe = bt.TimeFrame.Days, compression = 24)
 
     # Set our desired cash start
-    cerebro.broker.setcash(1000000000.0)
+    cerebro.broker.setcash(1000.0)
 
     # Add a FixedSize sizer according to the stake
     cerebro.addsizer(bt.sizers.FixedSize, stake=10)
