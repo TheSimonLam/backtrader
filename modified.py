@@ -18,7 +18,7 @@ class TestStrategy(bt.Strategy):
     def log(self, txt, dt=None):
         ''' Logging function fot this strategy'''
         dt = dt or self.datas[0].datetime.date(0)
-        # print('%s, %s' % (dt.isoformat(), txt))
+        print('%s, %s' % (dt.isoformat(), txt))
 
     def __init__(self):
         # Keep a reference to the "close" line in the data[0] dataseries
@@ -29,10 +29,10 @@ class TestStrategy(bt.Strategy):
         self.buyprice = None
 
         self.POINT_DISTANCE_TO_CLOSE_TRADE = 0.03
-        self.BET_SIZE_MULTIPLIER = 2
+        self.BET_SIZE_MULTIPLIER = 0
         self.bankrupt = False
 
-        self.startingBetSize = 10
+        self.startingBetSize = 100
         self.betSize = self.startingBetSize
         self.shouldLongAccordingTo200MA = True
         self.isLong = False
@@ -151,7 +151,7 @@ if __name__ == '__main__':
     cerebro.resampledata(data, timeframe = bt.TimeFrame.Days, compression = 1)
 
     # Set our desired cash start
-    cerebro.broker.setcash(100000.0)
+    cerebro.broker.setcash(10000.0)
 
     # Set the commission
     cerebro.broker.setcommission(commission=0.0)
