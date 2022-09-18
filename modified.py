@@ -18,7 +18,7 @@ class TestStrategy(bt.Strategy):
     def log(self, txt, dt=None):
         ''' Logging function fot this strategy'''
         dt = dt or self.datas[0].datetime.date(0)
-        print('%s, %s' % (dt.isoformat(), txt))
+        # print('%s, %s' % (dt.isoformat(), txt))
 
     def __init__(self):
         # Keep a reference to the "close" line in the data[0] dataseries
@@ -29,7 +29,7 @@ class TestStrategy(bt.Strategy):
         self.buyprice = None
 
         self.POINT_DISTANCE_TO_CLOSE_TRADE = 0.03
-        self.BET_SIZE_MULTIPLIER = 0
+        self.BET_SIZE_MULTIPLIER = 2
         self.bankrupt = False
 
         self.startingBetSize = 10
@@ -76,6 +76,12 @@ class TestStrategy(bt.Strategy):
     def notify_trade(self, trade):
         if not trade.isclosed:
             return
+
+        if trade.pnl < 0: 
+            self.betSize = self.betSize * 2
+        else:
+            self.betSize = self.startingBetSize
+            self.startingBetSize += self.BET_SIZE_MULTIPLIER
 
         self.log('OPERATION PROFIT, GROSS %.2f, NET %.2f' %
                  (trade.pnl, trade.pnlcomm))
