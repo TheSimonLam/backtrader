@@ -96,11 +96,14 @@ class TestStrategy(bt.Strategy):
 
         if not self.position:
             if self.shouldLongAccordingTo200MA:
-                self.order = self.buy(size=self.betSize)                
+                self.order = self.buy(size=self.betSize)
+            #else:
+            #    self.order = self.sell(size=self.betSize)
                 
         if self.position:
             if self.dataclose[0] >= self.buyprice + self.POINT_DISTANCE_TO_CLOSE_TRADE:
-                self.order = self.sell(size=self.position.size)
+                self.order = self.close()
+
 
 if __name__ == '__main__':
     # Create a cerebro entity
