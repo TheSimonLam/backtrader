@@ -62,6 +62,7 @@ class TestStrategy(bt.Strategy):
                          (order.executed.price,
                           order.executed.value,
                           order.executed.comm))
+                self.buyprice = order.executed.price
 
             self.bar_executed = len(self)
 
