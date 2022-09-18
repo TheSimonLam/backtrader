@@ -28,7 +28,7 @@ class TestStrategy(bt.Strategy):
         self.order = None
         self.buyprice = None
 
-        self.POINT_DISTANCE_TO_CLOSE_TRADE = 0.03
+        self.POINT_DISTANCE_TO_CLOSE_TRADE = 0.02
         self.BET_SIZE_MULTIPLIER = 0
         self.bankrupt = False
 
