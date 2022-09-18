@@ -6,3 +6,5 @@ Python 2.7.18
 Useful links:
 
 https://quantnomad.com/python-backtrader-strategy-on-multiple-timeframes/
+
+816 weeks from (2007, 1, 1) to (2022, 8, 29)

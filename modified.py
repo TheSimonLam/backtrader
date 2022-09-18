@@ -37,6 +37,8 @@ class TestStrategy(bt.Strategy):
         self.shouldLongAccordingTo200MA = True
         self.isLong = False
 
+        self.totalTrades = 0
+
         # Add a MovingAverageSimple indicator
         self.sma = bt.indicators.SimpleMovingAverage(
             self.data1, period=self.params.maperiod)
@@ -108,11 +110,14 @@ class TestStrategy(bt.Strategy):
             else:
                 self.isLong = False
                 self.order = self.sell(size=self.betSize)
+            self.totalTrades += 1
                 
         if self.position:
             if self.dataclose[0] >= self.buyprice + self.POINT_DISTANCE_TO_CLOSE_TRADE or self.dataclose[0] <= self.buyprice - self.POINT_DISTANCE_TO_CLOSE_TRADE:
                 self.order = self.close()
 
+    def stop(self):
+        print('Total trades: ', self.totalTrades)
 
 if __name__ == '__main__':
     # Create a cerebro entity
