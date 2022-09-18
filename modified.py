@@ -38,6 +38,8 @@ class TestStrategy(bt.Strategy):
         self.isLong = False
 
         self.totalTrades = 0
+        self.biggestLossStreak = 0
+        self.currentLossStreak = 0
 
         # Add a MovingAverageSimple indicator
         self.sma = bt.indicators.SimpleMovingAverage(
@@ -81,9 +83,13 @@ class TestStrategy(bt.Strategy):
 
         if trade.pnl < 0: 
             self.betSize = self.betSize * 2
+            self.currentLossStreak += 1
+            if self.currentLossStreak > self.biggestLossStreak:
+                self.biggestLossStreak = self.currentLossStreak
         else:
             self.betSize = self.startingBetSize
             self.startingBetSize += self.BET_SIZE_MULTIPLIER
+            self.currentLossStreak = 0
 
         self.log('OPERATION PROFIT, GROSS %.2f, NET %.2f' %
                  (trade.pnl, trade.pnlcomm))
@@ -118,6 +124,7 @@ class TestStrategy(bt.Strategy):
 
     def stop(self):
         print('Total trades: ', self.totalTrades)
+        print('Biggest loss streak: ', self.biggestLossStreak)
 
 if __name__ == '__main__':
     # Create a cerebro entity
