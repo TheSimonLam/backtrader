@@ -96,12 +96,14 @@ class TestStrategy(bt.Strategy):
 
         if not self.position:
             if self.shouldLongAccordingTo200MA:
+                self.isLong = True
                 self.order = self.buy(size=self.betSize)
-            #else:
-            #    self.order = self.sell(size=self.betSize)
+            else:
+                self.isLong = False
+                self.order = self.sell(size=self.betSize)
                 
         if self.position:
-            if self.dataclose[0] >= self.buyprice + self.POINT_DISTANCE_TO_CLOSE_TRADE:
+            if self.dataclose[0] >= self.buyprice + self.POINT_DISTANCE_TO_CLOSE_TRADE or self.dataclose[0] <= self.buyprice - self.POINT_DISTANCE_TO_CLOSE_TRADE:
                 self.order = self.close()
 
 
