@@ -27,7 +27,15 @@ class TestStrategy(bt.Strategy):
         # To keep track of pending orders and buy price/commission
         self.order = None
         self.buyprice = None
-        self.buycomm = None
+
+        self.POINT_DISTANCE_TO_CLOSE_TRADE = 0.03
+        self.BET_SIZE_MULTIPLIER = 0
+        self.bankrupt = False
+
+        self.startingBetSize = 10
+        self.betSize = self.startingBetSize
+        self.shouldLongAccordingTo200MA = True
+        self.isLong = False
 
         # Add a MovingAverageSimple indicator
         self.sma = bt.indicators.SimpleMovingAverage(
@@ -49,7 +57,6 @@ class TestStrategy(bt.Strategy):
                      order.executed.comm))
 
                 self.buyprice = order.executed.price
-                self.buycomm = order.executed.comm
             else:  # Sell
                 self.log('SELL EXECUTED, Price: %.2f, Cost: %.2f, Comm %.2f' %
                          (order.executed.price,
@@ -60,6 +67,7 @@ class TestStrategy(bt.Strategy):
 
         elif order.status in [order.Canceled, order.Margin, order.Rejected]:
             self.log('Order Canceled/Margin/Rejected')
+            self.bankrupt = True
 
         # Write down: no pending order
         self.order = None
@@ -73,33 +81,28 @@ class TestStrategy(bt.Strategy):
 
     def next(self):
         # Simply log the closing price of the series from the reference
-        self.log('Close, %.2f' % self.dataclose[0])
+        # self.log('Close, %.2f' % self.dataclose[0])
 
-        # Check if an order is pending ... if yes, we cannot send a 2nd one
+        if self.bankrupt is True:
+            cerebro.runstop()
+
+        if self.sma[0] > self.sma[-1]:
+            self.shouldLongAccordingTo200MA = True
+        elif self.sma[0] < self.sma[-1]:
+            self.shouldLongAccordingTo200MA = False
+
         if self.order:
             return
 
-        # Check if we are in the market
         if not self.position:
-
-            # Not yet ... we MIGHT BUY if ...
-            if self.dataclose[0] > self.sma[0]:
-
-                # BUY, BUY, BUY!!! (with all possible default parameters)
-                self.log('BUY CREATE, %.2f' % self.dataclose[0])
-
-                # Keep track of the created order to avoid a 2nd order
-                self.order = self.buy()
-
-        else:
-
-            if self.dataclose[0] < self.sma[0]:
-                # SELL, SELL, SELL!!! (with all possible default parameters)
-                self.log('SELL CREATE, %.2f' % self.dataclose[0])
-
-                # Keep track of the created order to avoid a 2nd order
-                self.order = self.sell()
-
+            if self.shouldLongAccordingTo200MA:
+                self.order = self.buy(size=self.betSize)
+                self.stop_loss = self.sell(exectype=bt.Order.StopTrail, trailamount=self.dataclose[0] - self.POINT_DISTANCE_TO_CLOSE_TRADE)
+                
+                
+        if self.position:
+            if self.dataclose[0] >= self.buyprice + self.POINT_DISTANCE_TO_CLOSE_TRADE:
+                self.order = self.sell(size=self.position.size)
 
 if __name__ == '__main__':
     # Create a cerebro entity
@@ -138,10 +141,7 @@ if __name__ == '__main__':
     cerebro.resampledata(data, timeframe = bt.TimeFrame.Days, compression = 1)
 
     # Set our desired cash start
-    cerebro.broker.setcash(1000.0)
-
-    # Add a FixedSize sizer according to the stake
-    cerebro.addsizer(bt.sizers.FixedSize, stake=10)
+    cerebro.broker.setcash(100000.0)
 
     # Set the commission
     cerebro.broker.setcommission(commission=0.0)
