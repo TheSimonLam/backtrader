@@ -96,9 +96,7 @@ class TestStrategy(bt.Strategy):
 
         if not self.position:
             if self.shouldLongAccordingTo200MA:
-                self.order = self.buy(size=self.betSize)
-                self.stop_loss = self.sell(exectype=bt.Order.StopTrail, trailamount=self.dataclose[0] - self.POINT_DISTANCE_TO_CLOSE_TRADE)
-                
+                self.order = self.buy(size=self.betSize)                
                 
         if self.position:
             if self.dataclose[0] >= self.buyprice + self.POINT_DISTANCE_TO_CLOSE_TRADE:
