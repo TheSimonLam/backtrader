@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 
@@ -12,7 +14,6 @@ import backtrader as bt
 # Create a Stratey
 class TestStrategy(bt.Strategy):
     params = (
-        # Standard MACD Parameters
         ('macd1', 12),
         ('macd2', 26),
         ('macdsig', 9),
@@ -32,10 +33,10 @@ class TestStrategy(bt.Strategy):
         self.buyprice = None
 
         self.POINT_DISTANCE_TO_CLOSE_TRADE = 0.03
-        self.BET_SIZE_MULTIPLIER = 2
+        self.BET_SIZE_MULTIPLIER = 18
         self.bankrupt = False
 
-        self.startingBetSize = 10
+        self.startingBetSize = 1700
         self.betSize = self.startingBetSize
         self.shouldLongAccordingTo200MA = True
         self.isLong = False
@@ -45,7 +46,7 @@ class TestStrategy(bt.Strategy):
         self.totalLosses = 0
         self.biggestLossStreak = 0
         self.currentLossStreak = 0
-        
+
         self.macdDaily = bt.indicators.MACD(self.data1,
             period_me1=self.p.macd1,
             period_me2=self.p.macd2,
@@ -119,8 +120,13 @@ class TestStrategy(bt.Strategy):
         if self.bankrupt is True:
             cerebro.runstop()
 
-        if self.order:
-            return
+        # if self.sma[0] > self.sma[-1]:
+        #     self.shouldLongAccordingTo200MA = True
+        # elif self.sma[0] < self.sma[-1]:
+        #     self.shouldLongAccordingTo200MA = False
+
+        # if self.order:
+        #     return
 
         # if not self.position:
         #     if self.shouldLongAccordingTo200MA:
@@ -185,7 +191,7 @@ if __name__ == '__main__':
     cerebro.broker.setcash(10000.0)
 
     # Set the commission
-    cerebro.broker.setcommission(commission=0.0)
+    cerebro.broker.setcommission(commission=0.0, mult=100.0)
 
     # Print out the starting conditions
     print('Starting Portfolio Value: %.2f' % cerebro.broker.getvalue())
@@ -194,7 +200,7 @@ if __name__ == '__main__':
     cerebro.run()
 
     # Print out the final result
-    print('Final Portfolio Value: %.2f' % cerebro.broker.getvalue())
+    print("Final Portfolio Value: £{:,.2f}".format(cerebro.broker.getvalue()))
 
     # Plot the result
     cerebro.plot(style='candle')
