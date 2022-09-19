@@ -29,7 +29,7 @@ class TestStrategy(bt.Strategy):
         self.buyprice = None
 
         self.POINT_DISTANCE_TO_CLOSE_TRADE = 0.03
-        self.BET_SIZE_MULTIPLIER = 1
+        self.BET_SIZE_MULTIPLIER = 2
         self.bankrupt = False
 
         self.startingBetSize = 10
@@ -38,6 +38,8 @@ class TestStrategy(bt.Strategy):
         self.isLong = False
 
         self.totalTrades = 0
+        self.totalWins = 0
+        self.totalLosses = 0
         self.biggestLossStreak = 0
         self.currentLossStreak = 0
 
@@ -84,12 +86,14 @@ class TestStrategy(bt.Strategy):
         if trade.pnl < 0: 
             self.betSize = self.betSize * 2
             self.currentLossStreak += 1
+            self.totalLosses += 1
             if self.currentLossStreak > self.biggestLossStreak:
                 self.biggestLossStreak = self.currentLossStreak
         else:
             self.betSize = self.startingBetSize
             self.startingBetSize += self.BET_SIZE_MULTIPLIER
             self.currentLossStreak = 0
+            self.totalWins += 1
 
         self.log('OPERATION PROFIT, GROSS %.2f, NET %.2f' %
                  (trade.pnl, trade.pnlcomm))
@@ -124,6 +128,9 @@ class TestStrategy(bt.Strategy):
 
     def stop(self):
         print('Total trades: ', self.totalTrades)
+        print('Total wins: ', self.totalWins)
+        print('Total losses: ', self.totalLosses)
+        print ('Winrate: {0:.0f}%'.format(self.totalWins / self.totalTrades * 100))
         print('Biggest loss streak: ', self.biggestLossStreak)
 
 if __name__ == '__main__':
