@@ -38,7 +38,7 @@ class TestStrategy(bt.Strategy):
 
         self.startingBetSize = 1700
         self.betSize = self.startingBetSize
-        self.shouldLongAccordingTo200MA = True
+        self.shouldLong = True
         self.isLong = False
 
         self.totalTrades = 0
@@ -125,26 +125,26 @@ class TestStrategy(bt.Strategy):
         # blue line
         print(self.macdDaily.signal[0])
 
-        # STRATEGY GOES LIKE THIS
-        # Long if (1M macd >0) AND (1M macd pointing up) AND (1W macd >0) AND (1W macd pointing up) and (1D macd has just become positive)
+        if self.macdMonthly.macd[0] > 0 and self.macdMonthly.macd[0] > self.macdMonthly.macd[-1] and self.macdWeekly.macd[0] > 0 and self.macdWeekly.macd[0] > self.macdWeekly.macd[-1] and self.macdDaily.macd[0] > 0:
+            self.shouldLong = True
+        elif self.macdMonthly.macd[0] < 0 and self.macdMonthly.macd[0] < self.macdMonthly.macd[-1] and self.macdWeekly.macd[0] < 0 and self.macdWeekly.macd[0] < self.macdWeekly.macd[-1] and self.macdDaily.macd[0] < 0:
+            self.shouldLong = False
 
-        # if self.sma[0] > self.sma[-1]:
-        #     self.shouldLongAccordingTo200MA = True
-        # elif self.sma[0] < self.sma[-1]:
-        #     self.shouldLongAccordingTo200MA = False
+        if self.order:
+            return
 
-        # if self.order:
-        #     return
-
-        # if not self.position:
-        #     if self.shouldLongAccordingTo200MA:
-        #         self.isLong = True
-        #         self.order = self.buy(size=self.betSize)
-        #     else:
-        #         self.isLong = False
-        #         self.order = self.sell(size=self.betSize)
-        #     self.totalTrades += 1
+        if not self.position:
+            if self.shouldLong:
+                self.isLong = True
+                self.order = self.buy(size=self.betSize)
+            else:
+                self.isLong = False
+                self.order = self.sell(size=self.betSize)
+            self.totalTrades += 1
                 
+
+        # Sort out how to sell now
+        
         # if self.position:
         #     if self.dataclose[0] >= self.buyprice + self.POINT_DISTANCE_TO_CLOSE_TRADE or self.dataclose[0] <= self.buyprice - self.POINT_DISTANCE_TO_CLOSE_TRADE:
         #         self.order = self.close()
