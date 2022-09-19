@@ -120,6 +120,14 @@ class TestStrategy(bt.Strategy):
         if self.bankrupt is True:
             cerebro.runstop()
 
+        # red line
+        print(self.macdDaily.macd[0])
+        # blue line
+        print(self.macdDaily.signal[0])
+
+        # STRATEGY GOES LIKE THIS
+        # Long if (1M macd >0) AND (1M macd pointing up) AND (1W macd >0) AND (1W macd pointing up) and (1D macd has just become positive)
+
         # if self.sma[0] > self.sma[-1]:
         #     self.shouldLongAccordingTo200MA = True
         # elif self.sma[0] < self.sma[-1]:
