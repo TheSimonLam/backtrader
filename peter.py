@@ -12,7 +12,10 @@ import backtrader as bt
 # Create a Stratey
 class TestStrategy(bt.Strategy):
     params = (
-        ('maperiod', 100),
+        # Standard MACD Parameters
+        ('macd1', 12),
+        ('macd2', 26),
+        ('macdsig', 9),
     )
 
     def log(self, txt, dt=None):
@@ -42,10 +45,21 @@ class TestStrategy(bt.Strategy):
         self.totalLosses = 0
         self.biggestLossStreak = 0
         self.currentLossStreak = 0
+        
+        self.macdDaily = bt.indicators.MACD(self.data1,
+            period_me1=self.p.macd1,
+            period_me2=self.p.macd2,
+            period_signal=self.p.macdsig)
 
-        # Add a MovingAverageSimple indicator
-        self.sma = bt.indicators.SimpleMovingAverage(
-            self.data1, period=self.params.maperiod)
+        self.macdWeekly = bt.indicators.MACD(self.data2,
+            period_me1=self.p.macd1,
+            period_me2=self.p.macd2,
+            period_signal=self.p.macdsig)
+
+        self.macdMonthly = bt.indicators.MACD(self.data3,
+            period_me1=self.p.macd1,
+            period_me2=self.p.macd2,
+            period_signal=self.p.macdsig)
 
     def notify_order(self, order):
         if order.status in [order.Submitted, order.Accepted]:
@@ -105,32 +119,28 @@ class TestStrategy(bt.Strategy):
         if self.bankrupt is True:
             cerebro.runstop()
 
-        if self.sma[0] > self.sma[-1]:
-            self.shouldLongAccordingTo200MA = True
-        elif self.sma[0] < self.sma[-1]:
-            self.shouldLongAccordingTo200MA = False
-
         if self.order:
             return
 
-        if not self.position:
-            if self.shouldLongAccordingTo200MA:
-                self.isLong = True
-                self.order = self.buy(size=self.betSize)
-            else:
-                self.isLong = False
-                self.order = self.sell(size=self.betSize)
-            self.totalTrades += 1
+        # if not self.position:
+        #     if self.shouldLongAccordingTo200MA:
+        #         self.isLong = True
+        #         self.order = self.buy(size=self.betSize)
+        #     else:
+        #         self.isLong = False
+        #         self.order = self.sell(size=self.betSize)
+        #     self.totalTrades += 1
                 
-        if self.position:
-            if self.dataclose[0] >= self.buyprice + self.POINT_DISTANCE_TO_CLOSE_TRADE or self.dataclose[0] <= self.buyprice - self.POINT_DISTANCE_TO_CLOSE_TRADE:
-                self.order = self.close()
+        # if self.position:
+        #     if self.dataclose[0] >= self.buyprice + self.POINT_DISTANCE_TO_CLOSE_TRADE or self.dataclose[0] <= self.buyprice - self.POINT_DISTANCE_TO_CLOSE_TRADE:
+        #         self.order = self.close()
 
     def stop(self):
         print('Total trades: ', self.totalTrades)
         print('Total wins: ', self.totalWins)
         print('Total losses: ', self.totalLosses)
-        print ('Winrate: {0:.0f}%'.format(self.totalWins / self.totalTrades * 100))
+        if self.totalTrades > 0 and self.totalWins > 0:
+            print ('Winrate: {0:.0f}%'.format(self.totalWins / self.totalTrades * 100))
         print('Biggest loss streak: ', self.biggestLossStreak)
 
 if __name__ == '__main__':
@@ -168,6 +178,8 @@ if __name__ == '__main__':
     cerebro.adddata(data)
 
     cerebro.resampledata(data, timeframe = bt.TimeFrame.Days, compression = 1)
+    cerebro.resampledata(data, timeframe = bt.TimeFrame.Weeks, compression = 1)
+    cerebro.resampledata(data, timeframe = bt.TimeFrame.Months, compression = 1)
 
     # Set our desired cash start
     cerebro.broker.setcash(10000.0)
