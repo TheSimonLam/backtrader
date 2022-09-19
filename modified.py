@@ -28,11 +28,11 @@ class TestStrategy(bt.Strategy):
         self.order = None
         self.buyprice = None
 
-        self.POINT_DISTANCE_TO_CLOSE_TRADE = 0.02
+        self.POINT_DISTANCE_TO_CLOSE_TRADE = 0.015
         self.BET_SIZE_MULTIPLIER = 0
         self.bankrupt = False
 
-        self.startingBetSize = 100
+        self.startingBetSize = 10
         self.betSize = self.startingBetSize
         self.shouldLongAccordingTo200MA = True
         self.isLong = False
