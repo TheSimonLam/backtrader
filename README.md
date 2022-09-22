@@ -6,6 +6,7 @@ Python 2.7.18
 Useful links:
 
 https://quantnomad.com/python-backtrader-strategy-on-multiple-timeframes/
+https://eatradingacademy.com/software/forex-historical-data/ (Format: MetaTrader CSV)
 
 816 weeks from (2007, 1, 1) to (2022, 8, 29)
 187 months
