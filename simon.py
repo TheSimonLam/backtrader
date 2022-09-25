@@ -107,10 +107,12 @@ class TestStrategy(bt.Strategy):
         if self.bankrupt is True:
             cerebro.runstop()
 
-        if self.sma[0] > self.sma[-1]:
+        if self.sma[-1] and self.sma[0] > self.sma[-1]:
             self.shouldLongAccordingTo200MA = True
-        elif self.sma[0] < self.sma[-1]:
+        elif self.sma[-1] and self.sma[0] < self.sma[-1]:
             self.shouldLongAccordingTo200MA = False
+        else:
+            return
 
         if self.order:
             return
@@ -151,8 +153,8 @@ if __name__ == '__main__':
     data = bt.feeds.GenericCSVData(
         dataname=datapath,
         dtformat=('%Y-%m-%d %H:%M'),
-        # fromdate=datetime.datetime(2021, 1, 1),
-        fromdate=datetime.datetime(2007, 1, 1),
+        fromdate=datetime.datetime(2021, 8, 29),
+        # fromdate=datetime.datetime(2007, 1, 1),
         todate=datetime.datetime(2022, 8, 29),
         reverse=False,
         nullvalue=0.0,
