@@ -30,7 +30,7 @@ class TestStrategy(bt.Strategy):
         self.order = None
         self.buyprice = None
 
-        self.POINT_DISTANCE_TO_CLOSE_TRADE = 0.03
+        self.POINT_DISTANCE_TO_CLOSE_TRADE = 0.029
         self.BET_SIZE_MULTIPLIER = 1
         self.bankrupt = False
 
@@ -172,7 +172,7 @@ if __name__ == '__main__':
     cerebro.resampledata(data, timeframe = bt.TimeFrame.Days, compression = 1)
 
     # Set our desired cash start
-    cerebro.broker.setcash(10000.0)
+    cerebro.broker.setcash(10000000.0)
 
     # Set the commission
     cerebro.broker.setcommission(commission=0.0, mult=100.0)
