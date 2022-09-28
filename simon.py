@@ -174,7 +174,7 @@ if __name__ == '__main__':
     cerebro.resampledata(data, timeframe = bt.TimeFrame.Days, compression = 1)
 
     # Set our desired cash start
-    cerebro.broker.setcash(10000000.0)
+    cerebro.broker.setcash(20000.0)
 
     # Set the commission
     cerebro.broker.setcommission(commission=0.0, mult=100.0)
