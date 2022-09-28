@@ -30,7 +30,7 @@ class TestStrategy(bt.Strategy):
         self.order = None
         self.buyprice = None
 
-        self.POINT_DISTANCE_TO_CLOSE_TRADE = 0.03
+        self.POINT_DISTANCE_TO_CLOSE_TRADE = 0.005
         self.BET_SIZE_MULTIPLIER = 1
         self.bankrupt = False
 
@@ -107,9 +107,9 @@ class TestStrategy(bt.Strategy):
         if self.bankrupt is True:
             cerebro.runstop()
 
-        if self.sma[-1] and self.sma[0] > self.sma[-1]:
+        if self.sma[-2] and self.sma[0] > self.sma[-2]:
             self.shouldLongAccordingTo200MA = True
-        elif self.sma[-1] and self.sma[0] < self.sma[-1]:
+        elif self.sma[-2] and self.sma[0] < self.sma[-2]:
             self.shouldLongAccordingTo200MA = False
         else:
             return
@@ -153,7 +153,7 @@ if __name__ == '__main__':
     data = bt.feeds.GenericCSVData(
         dataname=datapath,
         dtformat=('%Y-%m-%d %H:%M'),
-        fromdate=datetime.datetime(2014, 8, 29),
+        fromdate=datetime.datetime(2007, 1, 1),
         # fromdate=datetime.datetime(2007, 1, 1),
         todate=datetime.datetime(2022, 8, 29),
         reverse=False,
