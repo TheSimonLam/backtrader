@@ -30,7 +30,7 @@ class TestStrategy(bt.Strategy):
         self.order = None
         self.buyprice = None
 
-        self.POINT_DISTANCE_TO_CLOSE_TRADE = 0.06
+        self.POINT_DISTANCE_TO_CLOSE_TRADE = 0.03
         self.BET_SIZE_MULTIPLIER = 1
         self.bankrupt = False
 
@@ -153,7 +153,7 @@ if __name__ == '__main__':
     data = bt.feeds.GenericCSVData(
         dataname=datapath,
         dtformat=('%Y-%m-%d %H:%M'),
-        fromdate=datetime.datetime(2007, 1, 1),
+        fromdate=datetime.datetime(2020, 8, 29),
         # fromdate=datetime.datetime(2007, 1, 1),
         todate=datetime.datetime(2022, 8, 29),
         reverse=False,
