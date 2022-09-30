@@ -30,7 +30,6 @@ class TestStrategy(bt.Strategy):
         self.order = None
         self.buyprice = None
 
-        self.POINT_DISTANCE_TO_CLOSE_TRADE = 0.029
         self.BET_SIZE_MULTIPLIER = 1
         self.bankrupt = False
 
@@ -107,9 +106,9 @@ class TestStrategy(bt.Strategy):
         if self.bankrupt is True:
             cerebro.runstop()
 
-        if self.sma[-3] and self.sma[0] > self.sma[-3]:
+        if self.sma[-50] and self.sma[0] > self.sma[-50]:
             self.shouldLongAccordingTo200MA = True
-        elif self.sma[-3] and self.sma[0] < self.sma[-3]:
+        elif self.sma[-50] and self.sma[0] < self.sma[-50]:
             self.shouldLongAccordingTo200MA = False
         else:
             return
@@ -127,7 +126,7 @@ class TestStrategy(bt.Strategy):
             self.totalTrades += 1
                 
         if self.position:
-            if self.dataclose[0] >= self.buyprice + self.POINT_DISTANCE_TO_CLOSE_TRADE or self.dataclose[0] <= self.buyprice - self.POINT_DISTANCE_TO_CLOSE_TRADE:
+            if (self.isLong and self.sma[0] < self.sma[-50]) or (not self.isLong and self.sma[0] > self.sma[-50]):
                 self.order = self.close()
 
     def stop(self):
