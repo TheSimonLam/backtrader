@@ -30,7 +30,8 @@ class TestStrategy(bt.Strategy):
         self.order = None
         self.buyprice = None
 
-        self.POINT_DISTANCE_TO_CLOSE_TRADE = 0.029
+        self.POINT_DISTANCE_TO_CLOSE_TRADE_TP = 0.025
+        self.POINT_DISTANCE_TO_CLOSE_TRADE_SL = 0.04
         self.BET_SIZE_MULTIPLIER = 1
         self.bankrupt = False
 
@@ -127,7 +128,9 @@ class TestStrategy(bt.Strategy):
             self.totalTrades += 1
                 
         if self.position:
-            if self.dataclose[0] >= self.buyprice + self.POINT_DISTANCE_TO_CLOSE_TRADE or self.dataclose[0] <= self.buyprice - self.POINT_DISTANCE_TO_CLOSE_TRADE:
+            if self.isLong and (self.dataclose[0] >= self.buyprice + self.POINT_DISTANCE_TO_CLOSE_TRADE_TP or self.dataclose[0] <= self.buyprice - self.POINT_DISTANCE_TO_CLOSE_TRADE_SL):
+                self.order = self.close()
+            elif not self.isLong and (self.dataclose[0] >= self.buyprice + self.POINT_DISTANCE_TO_CLOSE_TRADE_SL or self.dataclose[0] <= self.buyprice - self.POINT_DISTANCE_TO_CLOSE_TRADE_TP):
                 self.order = self.close()
 
     def stop(self):
