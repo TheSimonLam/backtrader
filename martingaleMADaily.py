@@ -107,9 +107,9 @@ class TestStrategy(bt.Strategy):
         if self.bankrupt is True:
             cerebro.runstop()
 
-        if self.sma[-3] and self.sma[0] > self.sma[-3]:
+        if self.sma[-3] and self.sma[0] > self.sma[-1] and self.sma[-2] > self.sma[-3]:
             self.shouldLongAccordingTo200MA = True
-        elif self.sma[-3] and self.sma[0] < self.sma[-3]:
+        elif self.sma[-3] and self.sma[0] < self.sma[-1] and  self.sma[-2] < self.sma[-3]:
             self.shouldLongAccordingTo200MA = False
         else:
             return
