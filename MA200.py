@@ -43,7 +43,6 @@ class TestStrategy(bt.Strategy):
         self.totalLosses = 0
         self.biggestLossStreak = 0
         self.currentLossStreak = 0
-        self.gainLossMetric = 0
 
         # Add a MovingAverageSimple indicator
         self.sma = bt.indicators.SimpleMovingAverage(
@@ -97,8 +96,6 @@ class TestStrategy(bt.Strategy):
             self.currentLossStreak = 0
             self.totalWins += 1
 
-        self.gainLossMetric += trade.pnl
-
         self.log('OPERATION PROFIT, GROSS %.2f, NET %.2f' %
                  (trade.pnl, trade.pnlcomm))
 
@@ -138,7 +135,6 @@ class TestStrategy(bt.Strategy):
         print('Total losses: ', self.totalLosses)
         print ('Winrate: {0:.0f}%'.format(self.totalWins / self.totalTrades * 100))
         print('Biggest loss streak: ', self.biggestLossStreak)
-        print('Gain loss metric: ', self.gainLossMetric)
 
 if __name__ == '__main__':
     # Create a cerebro entity
@@ -183,13 +179,13 @@ if __name__ == '__main__':
     cerebro.broker.setcommission(commission=0.0)
 
     # Print out the starting conditions
-    # print('Starting Portfolio Value: %.2f' % cerebro.broker.getvalue())
+    print('Starting Portfolio Value: %.2f' % cerebro.broker.getvalue())
 
     # Run over everything
     cerebro.run()
 
     # Print out the final result
-    # print("Final Portfolio Value: £{:,.2f}".format(cerebro.broker.getvalue()))
+    print("Final Portfolio Value: £{:,.2f}".format(cerebro.broker.getvalue()))
 
     # Plot the result
     cerebro.plot(style='candle')

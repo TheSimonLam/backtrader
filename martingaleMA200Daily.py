@@ -34,7 +34,7 @@ class TestStrategy(bt.Strategy):
         self.BET_SIZE_MULTIPLIER = 1
         self.bankrupt = False
 
-        self.startingBetSize = 10
+        self.startingBetSize = 1
         self.betSize = self.startingBetSize
         self.shouldLongAccordingTo200MA = True
         self.isLong = False
@@ -177,7 +177,7 @@ if __name__ == '__main__':
     cerebro.broker.setcash(20000.0)
 
     # Set the commission
-    cerebro.broker.setcommission(commission=0.0, mult=100.0)
+    cerebro.broker.setcommission(commission=0.0)
 
     # Print out the starting conditions
     # print('Starting Portfolio Value: %.2f' % cerebro.broker.getvalue())
