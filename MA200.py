@@ -86,7 +86,7 @@ class TestStrategy(bt.Strategy):
             return
 
         if trade.pnl < 0: 
-            self.betSize = self.betSize * 2
+            # self.betSize = self.betSize * 2
             self.currentLossStreak += 1
             self.totalLosses += 1
             if self.currentLossStreak > self.biggestLossStreak:

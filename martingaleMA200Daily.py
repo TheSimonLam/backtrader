@@ -34,7 +34,7 @@ class TestStrategy(bt.Strategy):
         self.BET_SIZE_MULTIPLIER = 1
         self.bankrupt = False
 
-        self.startingBetSize = 1
+        self.startingBetSize = 10
         self.betSize = self.startingBetSize
         self.shouldLongAccordingTo200MA = True
         self.isLong = False
@@ -44,7 +44,6 @@ class TestStrategy(bt.Strategy):
         self.totalLosses = 0
         self.biggestLossStreak = 0
         self.currentLossStreak = 0
-        self.gainLossMetric = 0
 
         # Add a MovingAverageSimple indicator
         self.sma = bt.indicators.SimpleMovingAverage(
@@ -98,8 +97,6 @@ class TestStrategy(bt.Strategy):
             self.currentLossStreak = 0
             self.totalWins += 1
 
-        self.gainLossMetric += trade.pnl
-
         self.log('OPERATION PROFIT, GROSS %.2f, NET %.2f' %
                  (trade.pnl, trade.pnlcomm))
 
@@ -139,7 +136,6 @@ class TestStrategy(bt.Strategy):
         print('Total losses: ', self.totalLosses)
         print ('Winrate: {0:.0f}%'.format(self.totalWins / self.totalTrades * 100))
         print('Biggest loss streak: ', self.biggestLossStreak)
-        print('Gain loss metric: ', self.gainLossMetric)
 
 if __name__ == '__main__':
     # Create a cerebro entity
