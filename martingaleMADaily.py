@@ -30,7 +30,7 @@ class TestStrategy(bt.Strategy):
         self.order = None
         self.buyprice = None
 
-        self.POINT_DISTANCE_TO_CLOSE_TRADE_TP = 0.01
+        self.POINT_DISTANCE_TO_CLOSE_TRADE_TP = 0.02
         self.POINT_DISTANCE_TO_CLOSE_TRADE_SL = 0.07
         self.BET_SIZE_MULTIPLIER = 1
         self.bankrupt = False
@@ -183,13 +183,13 @@ if __name__ == '__main__':
     cerebro.broker.setcommission(commission=0.0)
 
     # Print out the starting conditions
-    print('Starting Portfolio Value: %.2f' % cerebro.broker.getvalue())
+    # print('Starting Portfolio Value: %.2f' % cerebro.broker.getvalue())
 
     # Run over everything
     cerebro.run()
 
     # Print out the final result
-    print("Final Portfolio Value: £{:,.2f}".format(cerebro.broker.getvalue()))
+    # print("Final Portfolio Value: £{:,.2f}".format(cerebro.broker.getvalue()))
 
     # Plot the result
     cerebro.plot(style='candle')
