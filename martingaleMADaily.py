@@ -156,7 +156,7 @@ if __name__ == '__main__':
     data = bt.feeds.GenericCSVData(
         dataname=datapath,
         dtformat=('%Y-%m-%d %H:%M'),
-        fromdate=datetime.datetime(2007, 1, 1),
+        fromdate=datetime.datetime(2020, 8, 29),
         # fromdate=datetime.datetime(2007, 1, 1),
         todate=datetime.datetime(2022, 8, 29),
         reverse=False,
